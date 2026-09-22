@@ -1,0 +1,242 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Cinzel", "Georgia", serif;
+  --font-body: "Inter", system-ui, sans-serif;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: #07070f;
+  color: #f5f5fa;
+  font-family: var(--font-body);
+  overflow-x: hidden;
+}
+
+/* ---------- Helpers 3D ---------- */
+.perspective-1200 {
+  perspective: 1200px;
+}
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* ---------- Tilt holographique (piloté par --rx --ry --mx --my) ---------- */
+.tilt-body {
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transform-style: preserve-3d;
+  transition: transform 0.12s ease-out;
+  will-change: transform;
+}
+
+.holo-sheen {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  mix-blend-mode: color-dodge;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.group-holo:hover .holo-sheen,
+.holo-on .holo-sheen {
+  opacity: 1;
+}
+/* Reflet blanc directionnel */
+.holo-sheen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    115deg,
+    transparent 25%,
+    rgba(255, 255, 255, 0.18) 42%,
+    rgba(255, 255, 255, 0.55) 50%,
+    rgba(255, 255, 255, 0.18) 58%,
+    transparent 75%
+  );
+  background-size: 220% 220%;
+  background-position: calc(var(--mx, 50) * 1%) calc(var(--my, 50) * 1%);
+}
+/* Couche arc-en-ciel (UltraRare) */
+.holo-rainbow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(
+      circle at calc(var(--mx, 50) * 1%) calc(var(--my, 50) * 1%),
+      rgba(255, 0, 128, 0.35),
+      rgba(0, 255, 255, 0.28) 30%,
+      rgba(255, 230, 0, 0.3) 60%,
+      transparent 80%
+    ),
+    conic-gradient(
+      from calc(var(--mx, 50) * 3.6deg),
+      #ff0080,
+      #ff8c00,
+      #ffee00,
+      #00ff88,
+      #00cfff,
+      #8a2be2,
+      #ff0080
+    );
+  filter: blur(6px) saturate(1.4);
+  opacity: 0.55;
+}
+
+/* ---------- Auras de suspense (hit) — perf : opacité seule (compositée GPU) ----------
+   Le box-shadow est STATIQUE sur un pseudo-élément ; on n'anime que son opacity,
+   donc aucun repaint : l'animation tourne sur le GPU. */
+.aura-gold,
+.aura-rainbow {
+  position: relative;
+}
+.aura-gold::before,
+.aura-rainbow::before {
+  content: "";
+  position: absolute;
+  inset: -10px;
+  border-radius: 1.1rem;
+  pointer-events: none;
+  z-index: 0;
+  will-change: opacity;
+}
+.aura-gold::before {
+  box-shadow:
+    0 0 30px 8px rgba(255, 200, 60, 0.55),
+    0 0 90px 24px rgba(255, 160, 20, 0.28);
+  animation: aura-fade 1.4s ease-in-out infinite;
+}
+.aura-rainbow::before {
+  box-shadow:
+    0 0 30px 8px rgba(255, 0, 128, 0.55),
+    0 0 44px 14px rgba(255, 230, 0, 0.35),
+    0 0 90px 24px rgba(0, 200, 255, 0.32);
+  animation: aura-fade-rainbow 2.2s ease-in-out infinite;
+}
+@keyframes aura-fade {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes aura-fade-rainbow {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .aura-gold::before,
+  .aura-rainbow::before {
+    animation: none;
+    opacity: 0.8;
+  }
+}
+
+/* ---------- Fond : dégradé STATIQUE + blobs animés en transform (GPU) ----------
+   Animer background-position sur un fond plein écran = repaint complet de la
+   page à chaque frame. Ici le fond ne bouge plus ; ce sont des blobs flous
+   positionnés en absolute qui dérivent via translate3d/scale (composité). */
+.bg-aurora {
+  background: linear-gradient(130deg, #0b0b1a, #141033, #1a0f2e, #0b1a2e, #0b0b1a);
+}
+.bg-cosmic-gold {
+  background: linear-gradient(130deg, #120b04, #241305, #1a0f2e, #241305, #120b04);
+}
+
+.aurora-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(90px);
+  opacity: 0.32;
+  background: radial-gradient(
+    circle,
+    rgba(99, 102, 241, 0.9),
+    rgba(217, 70, 239, 0.5) 45%,
+    transparent 70%
+  );
+  animation: blob-drift 30s ease-in-out infinite alternate;
+  will-change: transform;
+  pointer-events: none;
+}
+.bg-cosmic-gold .aurora-blob {
+  background: radial-gradient(
+    circle,
+    rgba(255, 190, 60, 0.85),
+    rgba(255, 120, 20, 0.5) 45%,
+    transparent 70%
+  );
+  opacity: 0.4;
+}
+@keyframes blob-drift {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(9vw, 7vh, 0) scale(1.18);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .aurora-blob {
+    animation: none;
+  }
+}
+
+@keyframes shine-sweep {
+  0% {
+    transform: translateX(-160%) skewX(-18deg);
+  }
+  100% {
+    transform: translateX(260%) skewX(-18deg);
+  }
+}
+.shine-sweep {
+  animation: shine-sweep 2.6s ease-in-out infinite;
+}
+
+/* Bord cranté du booster scellé */
+.crimped-edge {
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.25) 0 6px,
+    transparent 6px 12px
+  );
+  height: 8px;
+  mask-image: linear-gradient(180deg, black 40%, transparent 100%);
+}
+
+/* Dos de carte Weiss-like (stylisé, non copié) */
+.card-back {
+  background:
+    radial-gradient(circle at 50% 38%, rgba(255, 214, 112, 0.16), transparent 46%),
+    repeating-linear-gradient(
+      45deg,
+      #20142a 0 14px,
+      #2a1a3a 14px 28px
+    ),
+    #1a0f24;
+  box-shadow: inset 0 0 0 6px #120a1a, inset 0 0 0 8px rgba(255, 200, 90, 0.55);
+}
+
+.text-glow-gold {
+  text-shadow: 0 0 18px rgba(255, 200, 60, 0.75), 0 0 42px rgba(255, 160, 20, 0.4);
+}

@@ -1,0 +1,23 @@
+# Dépendances
+node_modules/
+
+# Build — on ne garde QUE dist/index.html (autonome) pour GitHub Pages
+dist/*
+!dist/index.html
+
+# Logs
+vite-dev.log
+*.log
+
+# Fichiers temporaires
+.tmp/
+.tmp_*
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Éditeurs
+.vscode/
+.idea/
+.freebuff/
