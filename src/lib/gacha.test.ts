@@ -20,8 +20,9 @@ describe('un booster normal', () => {
   it('contient toujours 8 cartes sans doublon', () => {
     for (let i = 0; i < 500; i++) {
       const pack = openBooster(cards);
-      expect(pack.cards).toHaveLength(8);
-      expect(new Set(pack.cards.map((p) => p.card.cardNo)).size).toBe(8);
+      const size = pack.isGodPack ? 5 : 8;   // un God Pack peut tomber au hasard
+      expect(pack.cards).toHaveLength(size);
+      expect(new Set(pack.cards.map((p) => p.card.cardNo)).size).toBe(size);
     }
   });
 
