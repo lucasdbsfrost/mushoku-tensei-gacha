@@ -1,0 +1,123 @@
+/* Révélation : les cartes du booster, face cachée, à retourner */
+.reveal { padding-top: 28px; }
+.reveal-head { text-align: center; max-width: 40rem; margin: 0 auto 28px; }
+.reveal-title { font-size: clamp(2rem, 5vw, 2.8rem); line-height: 1.1; }
+.reveal-title.is-god { color: var(--wax); }
+.reveal-text { margin-top: 6px; color: var(--ink-faded); font-style: italic; }
+.reveal-count { margin-top: 10px; font-size: .98rem; font-variant-numeric: oldstyle-nums; color: var(--ink-faded); }
+
+.spread {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(12px, 2.4vw, 26px);
+  max-width: 760px; margin: 0 auto;
+  perspective: 1400px;
+}
+.spread.is-god { grid-template-columns: repeat(5, minmax(0, 1fr)); max-width: 940px; }
+
+/* Une carte : un bouton qui contient les deux faces */
+.card {
+  position: relative; display: block; width: 100%;
+  aspect-ratio: 63 / 88;
+  padding: 0; border: 0; background: none; cursor: pointer;
+  border-radius: 4.5% / 3.2%;
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform .25s ease-out;
+  animation: deal .55s cubic-bezier(.2, .8, .25, 1) backwards;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+@keyframes deal {
+  from { opacity: 0; transform: translateY(-36px) rotate(calc((var(--i, 0) - 3.5) * 2deg)); }
+}
+.card-inner {
+  position: absolute; inset: 0;
+  transform-style: preserve-3d;
+  transition: transform .62s cubic-bezier(.3, .7, .25, 1);
+}
+.card.is-flipped .card-inner { transform: rotateY(180deg); }
+.card.is-hit .card-inner { transition-duration: 1.15s; }
+.card-face {
+  position: absolute; inset: 0; overflow: hidden;
+  border-radius: inherit;
+  -webkit-backface-visibility: hidden; backface-visibility: hidden;
+  box-shadow: 0 6px 16px rgb(80 56 24 / .22), 0 1px 2px rgb(80 56 24 / .3);
+}
+.card-front { transform: rotateY(180deg); background: var(--vellum-light); }
+
+/* Dos : lapis et cercle à la feuille d'or, comme dans la scène 3D */
+.card-back {
+  display: grid; place-items: center;
+  background: var(--lapis);
+  box-shadow: inset 0 0 0 5px var(--lapis), inset 0 0 0 6.5px var(--gold), 0 6px 16px rgb(80 56 24 / .22);
+}
+.card-back-sigil { width: 66%; color: var(--gold); }
+.card:not(.is-flipped):hover .card-back { background: var(--lapis-deep); }
+
+/* La dernière carte, la super rare, attend dans un filet d'or */
+.card.is-hit:not(.is-flipped) .card-back {
+  box-shadow: inset 0 0 0 5px var(--lapis), inset 0 0 0 6.5px var(--gold), 0 0 0 3px var(--gold), 0 8px 24px rgb(176 133 47 / .45);
+}
+
+.card-img { display: block; width: 100%; height: 100%; object-fit: cover; user-select: none; }
+
+/* Cadres selon la rareté */
+.card.tier-rare .card-front { box-shadow: 0 0 0 2px var(--lapis), 0 6px 16px rgb(80 56 24 / .22); }
+.card.tier-super-rare .card-front {
+  box-shadow: 0 0 0 3px var(--gold), 0 10px 30px rgb(176 133 47 / .5);
+}
+.card.tier-super-rare.is-flipped .card-front { animation: gilt 1.4s ease-out .55s; }
+@keyframes gilt {
+  0% { box-shadow: 0 0 0 3px var(--gold), 0 0 0 0 rgb(176 133 47 / .7); }
+  100% { box-shadow: 0 0 0 3px var(--gold), 0 0 0 26px rgb(176 133 47 / 0); }
+}
+
+/* Reflet qui suit la souris, sur les rares et super rares */
+.card-sheen {
+  position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(circle at var(--mx, 30%) var(--my, 20%), rgb(255 245 210 / .55), transparent 45%);
+  mix-blend-mode: soft-light;
+}
+.card.tier-super-rare .card-sheen {
+  background:
+    radial-gradient(circle at var(--mx, 30%) var(--my, 20%), rgb(255 236 170 / .7), transparent 42%),
+    linear-gradient(115deg, transparent 35%, rgb(255 230 160 / .35) 48%, transparent 60%);
+  mix-blend-mode: overlay;
+}
+
+/* Fiche de secours quand l'image officielle ne se charge pas */
+.card-fallback {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  padding: 10%; text-align: center;
+  background: var(--vellum-light);
+  box-shadow: inset 0 0 0 6px var(--vellum-light), inset 0 0 0 7px var(--ink);
+}
+.card-fallback-name { font-family: var(--display); font-size: clamp(1rem, 2.2vw, 1.4rem); line-height: 1.15; }
+.card-fallback-meta { font-size: .85rem; font-style: italic; color: var(--ink-faded); }
+
+/* Grand format */
+.zoom {
+  padding: 0; border: 0; background: transparent; max-width: 100vw; max-height: 100vh;
+  overflow: visible;
+}
+.zoom::backdrop { background: rgb(30 22 14 / .86); }
+.zoom-figure { display: flex; flex-direction: column; align-items: center; gap: 14px; margin: 0; padding: 16px; }
+.zoom-card {
+  position: relative;
+  width: min(86vw, calc((100vh - 190px) * 63 / 88), 460px);
+  aspect-ratio: 63 / 88; border-radius: 4.5% / 3.2%; overflow: hidden;
+  box-shadow: 0 20px 60px rgb(0 0 0 / .45);
+  background: var(--vellum-light);
+}
+.zoom-caption {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  color: var(--vellum-light); text-align: center; font-size: 1rem;
+}
+.zoom-name { font-family: var(--display); font-size: 1.6rem; }
+.zoom-close { color: var(--vellum-light); box-shadow: inset 0 0 0 1.5px var(--vellum-light); }
+.zoom-close:hover { background: rgb(239 229 204 / .12); }
+
+@media (max-width: 720px) {
+  .spread, .spread.is-god { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 360px; }
+  .spread.is-god .card:last-child { grid-column: 1 / -1; width: 50%; justify-self: center; }
+}

@@ -1,31 +1,32 @@
 {
-  "name": "mt-gacha-simulator",
+  "name": "mushoku-tensei-gacha",
   "private": true,
-  "version": "1.0.0",
+  "version": "2.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build && node scripts/copy-to-docs.mjs",
+    "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "scrape": "python scraper/cardmarket_scraper.py --out data/cards.json"
+    "audit": "npm audit --audit-level=moderate"
   },
   "dependencies": {
-    "canvas-confetti": "^1.9.3",
-    "framer-motion": "^11.18.2",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "@fontsource-variable/eb-garamond": "5.3.0",
+    "@fontsource/im-fell-english": "5.3.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "three": "0.186.1"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.1.4",
-    "@types/canvas-confetti": "^1.9.0",
-    "@types/react": "^18.3.18",
-    "@types/react-dom": "^18.3.5",
-    "@vitejs/plugin-react": "^4.4.1",
-    "tailwindcss": "^4.1.4",
-    "typescript": "^5.7.3",
-    "vite": "^6.2.4",
-    "vite-plugin-singlefile": "^2.3.3",
-    "vitest": "^3.1.1"
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@types/three": "0.186.0",
+    "@vitejs/plugin-react": "6.1.2",
+    "typescript": "6.0.3",
+    "vite": "8.3.5",
+    "vitest": "5.1.0"
+  },
+  "engines": {
+    "node": ">=20.19"
   }
 }

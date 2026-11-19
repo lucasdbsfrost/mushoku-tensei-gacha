@@ -1,45 +1,36 @@
 import { useCallback, useRef } from 'react';
 
-/**
- * Tilt 3D + position holographique.
- * Écrit des variables CSS sur l'élément :
- *   --rx/--ry : rotation (deg)   --mx/--my : position souris (0-100)
- * Le CSS (.tilt-body / .holo-sheen) les consomme — aucun re-render React.
+/*
+ * Inclinaison 3D et reflet qui suit le pointeur, pour les cartes précieuses.
+ * Écrit des variables CSS (--rx, --ry, --mx, --my) : aucun rendu React.
  */
-export function useTilt<T extends HTMLElement>(maxDeg = 12) {
-  const raf = useRef<number | null>(null);
+export function useTilt<T extends HTMLElement>(maxDeg = 10) {
+  const raf = useRef(0);
 
-  const apply = useCallback(
-    (el: T, clientX: number, clientY: number) => {
-      const rect = el.getBoundingClientRect();
-      const px = (clientX - rect.left) / rect.width; // 0..1
-      const py = (clientY - rect.top) / rect.height; // 0..1
-      const ry = (px - 0.5) * 2 * maxDeg;
-      const rx = -(py - 0.5) * 2 * maxDeg;
-      el.style.setProperty('--rx', `${rx.toFixed(2)}deg`);
-      el.style.setProperty('--ry', `${ry.toFixed(2)}deg`);
-      el.style.setProperty('--mx', `${(px * 100).toFixed(1)}`);
-      el.style.setProperty('--my', `${(py * 100).toFixed(1)}`);
-    },
-    [maxDeg],
-  );
-
-  const onPointerMove = useCallback(
-    (e: React.PointerEvent<T>) => {
-      const el = e.currentTarget;
-      if (raf.current) cancelAnimationFrame(raf.current);
-      raf.current = requestAnimationFrame(() => apply(el, e.clientX, e.clientY));
-    },
-    [apply],
-  );
+  const onPointerMove = useCallback((e: React.PointerEvent<T>) => {
+    if (e.pointerType !== 'mouse') return;
+    const el = e.currentTarget;
+    const { clientX, clientY } = e;
+    cancelAnimationFrame(raf.current);
+    raf.current = requestAnimationFrame(() => {
+      const r = el.getBoundingClientRect();
+      const px = (clientX - r.left) / r.width;
+      const py = (clientY - r.top) / r.height;
+      el.style.setProperty('--rx', `${(-(py - 0.5) * 2 * maxDeg).toFixed(2)}deg`);
+      el.style.setProperty('--ry', `${((px - 0.5) * 2 * maxDeg).toFixed(2)}deg`);
+      el.style.setProperty('--mx', `${(px * 100).toFixed(1)}%`);
+      el.style.setProperty('--my', `${(py * 100).toFixed(1)}%`);
+    });
+  }, [maxDeg]);
 
   const onPointerLeave = useCallback((e: React.PointerEvent<T>) => {
+    cancelAnimationFrame(raf.current);
     const el = e.currentTarget;
-    el.style.setProperty('--rx', '0deg');
-    el.style.setProperty('--ry', '0deg');
-    el.style.setProperty('--mx', '50');
-    el.style.setProperty('--my', '50');
+    el.style.removeProperty('--rx');
+    el.style.removeProperty('--ry');
+    el.style.removeProperty('--mx');
+    el.style.removeProperty('--my');
   }, []);
 
-  return { tiltHandlers: { onPointerMove, onPointerLeave } };
+  return { onPointerMove, onPointerLeave };
 }

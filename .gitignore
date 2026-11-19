@@ -1,23 +1,18 @@
-# Dépendances
+# Dépendances et site généré (publié par GitHub Actions)
 node_modules/
+dist/
+docs/
 
-# Build — on ne garde QUE dist/index.html (autonome) pour GitHub Pages
-dist/*
-!dist/index.html
+# Variables d'environnement locales
+.env
+.env.*
+!.env.example
 
-# Logs
-vite-dev.log
+# Divers
 *.log
-
-# Fichiers temporaires
-.tmp/
-.tmp_*
-
-# OS
-Thumbs.db
+.vite/
 .DS_Store
-
-# Éditeurs
+Thumbs.db
 .vscode/
 .idea/
 .freebuff/

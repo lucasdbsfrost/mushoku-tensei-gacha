@@ -1,62 +1,61 @@
-# 🎴 Gacha Simulator — Mushoku Tensei (UNION ARENA)
+# Mushoku Tensei, simulateur de boosters
 
-Simulateur d'ouverture de boosters **UNION ARENA [UA54BT] — Mushoku Tensei: Jobless Reincarnation**, avec animations haut de gamme : déchirure du pack, flip 3D des cartes, auras de suspense, tilt holographique, confettis et God Pack cosmique.
+Un simulateur d'ouverture de boosters UNION ARENA pour la série Mushoku Tensei
+(UA54BT), que j'ai fait pour le plaisir et pour m'entraîner.
 
-**⚡ Démo instantanée : ouvrir `dist/index.html` (double-clic, tout est embarqué).**
+Le site est en ligne ici : https://lucasdbsfrost.github.io/mushoku-tensei-gacha/
 
-## ✨ Fonctionnalités
+## Ce qu'on y fait
 
-- **Booster 8 cartes** fidèle aux specs officielles : 5 Commons (+ AP bonus) → Uncommon → Rare → **hit SR garanti** (20 % de parallèle SRP)
-- **God Pack 0,1 %** : 5 SR distinctes + fanfare + thème cosmique
-- **Flip 3D** avec slow reveal sur le hit, aura dorée/arc-en-ciel
-- **Tilt holographique** réactif à la souris sur les rares
-- **Zoom plein écran** : cliquer une carte révélée l'affiche entière (ratio 5/7, jamais coupée)
-- **Sons WebAudio** synthétisés (aucun asset externe)
-- **Animations GPU** : uniquement `transform`/`opacity`, fond statique — fluide même sur petites machines
-- **120 cartes** avec scans officiels et raretés exactes
+On brise le sceau d'un booster posé sur un cercle magique, les huit cartes
+s'envolent, puis on les retourne une à une. La dernière est toujours une super
+rare. Une fois sur mille, c'est un God Pack : cinq super rares d'un coup.
 
-## 🚀 Utilisation
+Chaque carte tirée rejoint l'album, qui reprend les 120 cartes du set dans
+l'ordre de leur numéro, avec le nombre de boosters ouverts, de super rares et
+de doublons. L'album est gardé dans le navigateur : rien n'est envoyé nulle part.
 
-### Sans rien installer (recommandé)
+## L'idée graphique
 
-Ouvrir `dist/index.html` dans un navigateur. C'est un **fichier unique autonome** (HTML + JS + CSS + données inline). Seules les images viennent du CDN officiel d'UNION ARENA (connexion internet nécessaire).
+Je voulais que le site ressemble à un grimoire de l'univers de Mushoku Tensei :
+du vélin, de l'encre, le bleu lapis des manuscrits enluminés, et la feuille
+d'or réservée aux super rares. Le booster devient un pli scellé à la cire.
 
-### En mode dev
+Seule l'ouverture est en 3D (three.js), et le code 3D n'est chargé qu'à ce
+moment-là. Le reste est du HTML léger, pour rester fluide sur téléphone. Les
+sons sont synthétisés en direct, sans aucun fichier audio.
+
+## Comment c'est fait
+
+- React et TypeScript, assemblés avec Vite
+- la logique de tirage est dans `src/lib/gacha.ts`, avec ses tests dans `gacha.test.ts`
+- la scène 3D est dans `src/three/`
+- l'album et les statistiques sont dans `src/lib/collection.ts`
+- les données des cartes viennent de `public/data/cards.json`, générées par
+  `scripts/fetch_unionarena.py` depuis la cardlist officielle
 
 ```bash
-npm install
-npm run dev        # http://localhost:5173
-npm run build      # régénère dist/index.html (autonome)
-npx vitest run     # tests (11)
+npm ci        # installe exactement les versions prévues
+npm run dev   # le site en local
+npm test      # les tests du tirage et de l'album
 ```
 
-## 🗂️ Sources de données
+Le site est republié automatiquement par GitHub Actions à chaque envoi sur `main`.
 
-| Source | Rôle |
-|---|---|
-| [Cardlist officielle UNION ARENA](https://www.unionarena-tcg.com/en/cardlist/?search=true&series=589154) | 120 cartes, raretés, images HD officielles |
-| [TCGCSV / TCGplayer](https://tcgcsv.com) | Prix market (optionnel — set pas encore indexé) |
+## Côté sécurité
 
-Scripts :
-```bash
-python scripts/fetch_unionarena.py      # régénère public/data/cards.json (cardlist officielle)
-python scripts/fetch_cards_tcgplayer.py # variante Weiss Schwarz (set 2022)
-```
+Comme pour mon portfolio : les polices et three.js sont servis par le site
+lui-même, une Content-Security-Policy n'autorise que le site et les images de
+la cardlist officielle, les versions des dépendances sont figées, et la
+publication tourne avec le minimum de droits.
 
-## 📁 Structure
+## À savoir
 
-```
-├── dist/index.html          # Build autonome (ouvrable en double-clic)
-├── public/data/cards.json   # Données des cartes (source de l'app)
-├── src/
-│   ├── lib/gacha.ts         # Algorithme de tirage (God Pack, hit SR garanti)
-│   ├── lib/tiers.ts         # Classification par prix/rareté
-│   ├── components/          # BoosterPack, GachaCard, CardZoomModal, GodPackOverlay…
-│   └── hooks/useTilt.ts     # Tilt holographique (variables CSS, zéro re-render)
-├── scripts/                 # Scrapers Python (unionarena-tcg.com, TCGCSV)
-└── scraper/                 # Scraper Cardmarket (curl_cffi) — variante prix €
-```
+La composition des boosters suit les règles officielles (cinq communes, une
+peu commune, une rare, une super rare). Les taux des cartes AP et des
+parallèles ne sont pas publiés par Bandai : ceux du simulateur sont des
+estimations.
 
-## ⚖️ Mentions
-
-Projet non officiel, sans affiliation avec BANDAI, Bushiroad ou les ayants droit de Mushoku Tensei. Images © BANDAI (cardlist officielle UNION ARENA), utilisées à titre de référence. Prix indicatifs.
+Projet non officiel, sans lien avec BANDAI ni les ayants droit de Mushoku
+Tensei. Les images des cartes sont chargées depuis la cardlist officielle
+UNION ARENA.

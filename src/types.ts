@@ -1,31 +1,24 @@
-export type Tier = 'Common' | 'Uncommon' | 'SuperRare' | 'UltraRare';
-
-/** Carte brute issue du scraping (data/cards.json). */
+/** Une carte du set, telle que décrite dans public/data/cards.json. */
 export interface Card {
   name: string;
   rarity: string;
   imageUrl: string;
-  priceTrend: number;
-  /** Numéro officiel (ex: UA54BT/MST-1-001) — présent selon la source. */
-  cardNo?: string;
-  /** BP affiché sur les cartes UNION ARENA — optionnel. */
+  /** Numéro officiel, unique, par exemple UA54BT/MST-1-001 */
+  cardNo: string;
   bp?: string;
-  /** Provenance du prix : tcgplayer | estimate — optionnel. */
-  priceSource?: 'tcgplayer' | 'estimate';
 }
 
-/** Carte tirée dans un booster. */
+/** Les quatre niveaux d'affichage, du plus courant au plus précieux. */
+export type Tier = 'commune' | 'peu-commune' | 'rare' | 'super-rare';
+
+/** Une carte sortie d'un booster, avec sa position dans le paquet. */
 export interface PackedCard {
   card: Card;
   tier: Tier;
-  /** Position 1..5 dans le booster (5 = carte rare garantie). */
   slot: number;
 }
 
-export interface BoosterPack {
+export interface Pack {
   isGodPack: boolean;
   cards: PackedCard[];
-  totalValue: number;
 }
-
-export type TierPools = Record<Tier, Card[]>;
